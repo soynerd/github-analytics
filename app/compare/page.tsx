@@ -1,0 +1,12 @@
+import { getProfile, ProfileAnalytics } from "../../lib/github";
+
+function value(profile: ProfileAnalytics) { return { repositories: profile.repos.length, stars: profile.repos.reduce((sum, repo) => sum + repo.stargazers_count, 0), followers: profile.user.followers, contributions: profile.totalContributions, streak: profile.longestStreak, pullRequests: profile.pullRequests }; }
+
+export default async function Compare({ searchParams }: { searchParams: Promise<{ left?: string; right?: string }> }) {
+  const { left, right } = await searchParams;
+  let profiles: [ProfileAnalytics, ProfileAnalytics] | null = null;
+  if (left && right) { try { profiles = await Promise.all([getProfile(left), getProfile(right)]); } catch { profiles = null; } }
+  const rows: Array<[string, number, number]> = profiles ? Object.entries(value(profiles[0])).map(([label, one]) => [label, one as number, value(profiles![1])[label as keyof ReturnType<typeof value>]]) : [];
+  return <main className="compare-page"><nav className="nav"><a className="brand" href="/"><span className="brand-mark">⌁</span> gitlume</a><a className="github-link" href="/">Analyze a profile →</a></nav><section className="compare-intro"><p className="eyebrow"><i /> SIDE BY SIDE</p><h1>Compare developer<br/><em>momentum.</em></h1><form className="compare-form"><input name="left" defaultValue={left} placeholder="First GitHub username" required/><span>vs</span><input name="right" defaultValue={right} placeholder="Second GitHub username" required/><button>Compare →</button></form></section>{profiles ? <section className="compare-results"><div className="compare-people"><Person profile={profiles[0]}/><span>vs</span><Person profile={profiles[1]}/></div><div className="compare-table card">{rows.map(([label, one, two]) => <div key={label}><span>{label.replace(/([A-Z])/g, " $1")}</span><b className={Number(one) >= Number(two) ? "winner" : ""}>{String(one)}</b><b className={Number(two) >= Number(one) ? "winner" : ""}>{String(two)}</b></div>)}</div></section> : left || right ? <p className="compare-error">Both public profiles need to be available before they can be compared.</p> : null}</main>;
+}
+function Person({ profile }: { profile: ProfileAnalytics }) { return <a href={`/${profile.user.login}`}><img src={profile.user.avatar_url} alt=""/><strong>{profile.user.name || profile.user.login}</strong><span>@{profile.user.login}</span></a>; }
