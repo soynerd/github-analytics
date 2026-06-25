@@ -4,17 +4,20 @@
 
 # GitLume — Project Details
 
-[GitLume](https://gitlume.soynerd.co.in) is a fully public GitHub analytics application. Visitors can search any public GitHub username without creating an account or granting GitHub permissions.
+[GitLume](https://gitlume.soynerd.co.in) is a fully public GitHub analytics application. It provides public GitHub profile analytics, profile comparison, repository analytics, and repository dependency security scanning. The security scanner analyzes public GitHub repositories for known dependency vulnerabilities and does not require an LLM. Visitors can search any public GitHub username without creating an account or granting GitHub permissions.
 
 ## Core experience
 
-- Landing page with GitHub username search and example profiles.
+- Landing page with GitHub username search and first-time navigation onboarding.
 - Public profile dashboard at `/{username}`.
 - Side-by-side public profile comparison at `/compare?left=username-a&right=username-b`.
-- JSON API endpoint at `/api/profile/{username}`.
-- Focused JSON endpoints for repositories, languages, contributions, profile comparison, and cache status.
+- Comprehensive analytics including repository, contribution, language, and GitHub organization/collaboration data.
+- Deterministic achievements and insights.
+- Repository dependency security scanning.
+- JSON API endpoints including `/api/profile/{username}` and focused endpoints for repositories, languages, contributions, profile comparison, and cache status.
 - Browser-native JSON download, share control, and print-to-PDF export.
-- Responsive interface for desktop and mobile.
+- Responsive UI for desktop and mobile with dark/light mode support.
+- Loading states for improved user experience.
 - Dedicated profile-not-found, temporary API failure, and missing-server-token states.
 
 ## Profile information
@@ -67,6 +70,16 @@ Each profile dashboard displays public:
 - Deterministic achievements for star count, repository count, language diversity, streak length, and public contribution.
 - Repository-health and project-story panels using factual public data only.
 
+## Repository Security Scanner
+
+GitLume includes a deterministic, non-LLM security scanner that analyzes public GitHub repositories for known dependency vulnerabilities.
+
+- Users can provide a repository in the format `owner/repository` or as a full GitHub repository URL.
+- Supports scanning `package.json`, `package-lock.json`, and `requirements.txt` manifest files.
+- Uses the [OSV.dev](https://osv.dev) API as the vulnerability provider to detect vulnerabilities and assess their severity (CRITICAL, HIGH, MODERATE, LOW).
+- Determines if vulnerable dependencies are direct or transitive.
+- Scan results are cached in the database against the repository's commit SHA to avoid redundant API calls and rate limits.
+
 ## Data architecture
 
 - One server-side GitHub GraphQL query retrieves profile, organizations, repositories, language data, releases, licenses, topics, contribution calendar, pull requests, issues, reviews, gists, social links, and pinned repositories.
@@ -78,12 +91,18 @@ Each profile dashboard displays public:
 
 ## Database
 
-The Prisma `AnalyticsCache` model contains:
+The Prisma schema includes two primary models:
 
+**AnalyticsCache:**
 - `username` — unique profile key.
 - `data` — processed analytics JSON.
 - `cachedAt` and `updatedAt` — cache timestamps.
 - `expiresAt` — 12-hour freshness boundary.
+
+**SecurityScan:**
+- `owner`, `repository`, and `commitSha` — unique composite key for a repository state.
+- `status` and `result` — the outcome and JSON payload of the scan.
+- `scannedAt`, `createdAt`, and `updatedAt` — scan timestamps.
 
 ## Configuration
 
@@ -118,6 +137,7 @@ npm run build
 - `GET /api/profile/{username}/contributions` — contribution days and streaks.
 - `GET /api/compare?left=user-a&right=user-b` — two public profiles in one response.
 - `GET /api/cache/{username}` — cache availability and freshness metadata.
+- `GET /api/security?repo=owner/repo` — repository dependency security scan results.
 
 ## Public-data boundaries
 
