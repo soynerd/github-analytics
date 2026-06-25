@@ -1,4 +1,5 @@
 import { SearchBox } from "../components/search-box";
+import { OnboardingHint } from "../components/onboarding-hint";
 
 const features = [
   ["◫", "The complete picture", "Repositories, languages, popularity, and contribution patterns—brought into focus."],
@@ -8,7 +9,14 @@ const features = [
 
 export default function Home() {
   return <main className="landing">
-    <nav className="nav"><a className="brand" href="/"><span className="brand-mark">⌁</span> gitlume</a><a className="nav-note" href="/compare">Compare developers →</a></nav>
+    <nav className="nav">
+      <a className="brand" href="/"><span className="brand-mark">⌁</span> gitlume</a>
+      <div style={{ display: "flex", gap: "20px", position: "relative" }}>
+        <a className="nav-note" href="/compare">Compare developers →</a>
+        <a className="nav-note" href="/security">Security Scanner →</a>
+        <OnboardingHint />
+      </div>
+    </nav>
     <section className="hero">
       <div className="eyebrow"><i /> GITHUB ANALYTICS, REIMAGINED</div>
       <h1>See your work<br /><em>in a new light.</em></h1>

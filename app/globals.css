@@ -11,3 +11,73 @@
 .health-card,.fun-card{padding:26px}.health-list{margin-top:22px}.health-list>div{display:flex;align-items:center;justify-content:space-between;gap:18px;border-top:1px solid #e5e8e1;padding:11px 0;font-size:12px}.health-list span{color:var(--muted)}.health-list b{font:500 13px 'DM Mono',monospace;text-align:right;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .export-controls{display:flex;gap:8px}.export-controls button{border:0;background:transparent;color:var(--ink);font:11px 'DM Mono',monospace;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}@media(max-width:760px){.export-controls{order:2}.dash-footer .export-controls{flex-wrap:wrap}}
 @media print{.dash-nav,.dash-footer,.export-controls,.follow{display:none!important}.dashboard{max-width:none;padding:0}.card{break-inside:avoid}}
+
+/* Loading & Onboarding UX */
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-left-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.onboarding-hint {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--coral);
+  z-index: 10;
+  animation: fadeIn 0.5s ease-out;
+  cursor: pointer;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.onboarding-text {
+  background: var(--paper);
+  border: 1px solid var(--coral);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.onboarding-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 16px;
+  line-height: 1;
+}
+.onboarding-close:hover {
+  color: var(--ink);
+}
+.onboarding-arrow {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 4px;
+  margin-right: 20px;
+  stroke: var(--coral);
+}
+@media (max-width: 760px) {
+  .onboarding-hint {
+    top: 50px;
+    right: 10px;
+  }
+}
